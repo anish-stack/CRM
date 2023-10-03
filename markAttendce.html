@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="home.css">
+    <title>Attendance Marking</title>
+</head>
+<body>
+    <nav class="sidebar">
+        <ul>
+            <li><a href="#"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="#"><i class="fas fa-clipboard-check"></i> Make Attendance</a></li>
+            <li><a href="#"><i class="fas fa-users"></i> Client</a></li>
+            <li><a href="#"><i class="fas fa-search"></i> Get Client by Mobile Number</a></li>
+            <li><a href="#"><i class="fas fa-history"></i> Follow-Up</a></li>
+            <li><a href="#"><i class="fas fa-user"></i> User</a></li>
+            <li><a href="#"><i class="fas fa-download"></i> Download Client Details</a></li>
+            <li><a href="#"><i class="fas fa-download"></i> Download Attendance Sheets</a></li>
+            <li><a href="#"><i class="fas fa-edit"></i> Change-Client-Detail</a></li>
+            <li><a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            <li><a href="#"><i class="fas fa-user"></i> User</a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <div class="attendance-form">
+            <h2>Mark Attendance</h2>
+            <form id="mark-attendance-form">
+                <div>
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" required>    
+                </div>
+                <div>
+                    <label for="date-time">Date and Time:</label>
+                    <input type="datetime-local" id="date-time"  required>
+                </div>
+                <button type="submit">Mark Attendance</button>
+            </form>
+            <div id="attendance-time"></div>
+        </div>
+    </div>
+
+   
+
+</body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const markAttendanceForm = document.getElementById('mark-attendance-form');
+        const attendanceTime = document.getElementById('attendance-time');
+        const dateTimeInput = document.getElementById('date-time');
+    
+        // Get the current date and time in the "Asia/Kolkata" time zone
+        const currentTime = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+        dateTimeInput.value = currentTime; // Set the input field's value
+    
+        markAttendanceForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+    
+            // Retrieve user input
+            const email = document.getElementById('email').value;
+            const dateTime = dateTimeInput.value;
+    
+            // Make an AJAX request to mark attendance
+            fetch(`http://localhost:4000/api/mark-attendce/${email}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ dateTime }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    attendanceTime.textContent = `Attendance marked successfully at ${data.entryTime}.`;
+                } else {
+                    attendanceTime.textContent = `Failed to mark attendance: ${data.message}`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    });
+    </script
+</html>
